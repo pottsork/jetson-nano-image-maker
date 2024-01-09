@@ -85,7 +85,7 @@ case "$JETSON_NANO_BOARD" in
         nano_board_revision=${JETSON_NANO_REVISION:=300}
         printf "Creating image for Jetson nano board (%s revision)... "
         ROOTFS_DIR=$JETSON_ROOTFS_DIR $JETSON_BUILD_DIR/Linux_for_Tegra/tools/jetson-disk-image-creator.sh \
-            -o jetson.img -b jetson-orin-nano-devkit
+            -o jetson.img -b jetson-orin-nano-devkit -d SD
         printf "[OK]\n"
         ;;
     *)
