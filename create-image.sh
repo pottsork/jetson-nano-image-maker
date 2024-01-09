@@ -96,3 +96,4 @@ esac
 
 printf "\e[32mImage created successfully\n"
 printf "Image location ./jetson.img\n"
+printf ""
