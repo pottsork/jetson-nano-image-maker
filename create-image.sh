@@ -7,7 +7,7 @@
 
 set -e
 
-BSP=https://developer.nvidia.com/downloads/remetpack-463r32releasev73t210jetson-210linur3273aarch64tbz2
+BSP=https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v4.1/release/jetson_linux_r35.4.1_aarch64.tbz2/
 
 # Check if the user is not root
 if [ "x$(whoami)" != "xroot" ]; then
@@ -57,6 +57,12 @@ if [ ! "$(ls -A $JETSON_BUILD_DIR)" ]; then
                 # So we arbitraryly preallocate extra 128MiB ((rootfs_size + 128MiB + (rootfs_size / 10))
                 sed -i 's/rootfs_size +/rootfs_size + 128 +/g' "$JETSON_BUILD_DIR/Linux_for_Tegra/tools/jetson-disk-image-creator.sh"
                 ;;
+            *35.4*)
+                # When preallocating loopback image space for root, nvidia's script uses ((rootfs_size + (rootfs_size /10))
+                # In case of a 400MiB rootfs, this causes the same script to fail copying rootfs into the root image.
+                # So we arbitraryly preallocate extra 128MiB ((rootfs_size + 128MiB + (rootfs_size / 10))
+                sed -i 's/rootfs_size +/rootfs_size + 128 +/g' "$JETSON_BUILD_DIR/Linux_for_Tegra/tools/jetson-disk-image-creator.sh"
+                ;;
         esac     
 fi
 
@@ -75,7 +81,13 @@ case "$JETSON_NANO_BOARD" in
             -o jetson.img -b jetson-nano -r $nano_board_revision
         printf "[OK]\n"
         ;;
-
+    jetson-orin-nano-devkit)
+        nano_board_revision=${JETSON_NANO_REVISION:=300}
+        printf "Creating image for Jetson nano board (%s revision)... "
+        ROOTFS_DIR=$JETSON_ROOTFS_DIR $JETSON_BUILD_DIR/Linux_for_Tegra/tools/jetson-disk-image-creator.sh \
+            -o jetson.img -b jetson-orin-nano-devkit
+        printf "[OK]\n"
+        ;;
     *)
 	printf "\e[31mUnknown Jetson nano board type\e[0m\n"
 	exit 1
